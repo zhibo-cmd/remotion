@@ -82,4 +82,25 @@ export async function getUserTweets(
   };
 }
 
+export async function searchTweets(
+  query: string,
+  queryType: "Top" | "Latest" = "Top",
+  count = 20,
+  cursor?: string
+): Promise<TweetsResponse> {
+  const params: Record<string, string> = {
+    query,
+    queryType,
+    count: String(count),
+  };
+  if (cursor) params.cursor = cursor;
+
+  const data = await apiFetch<any>("/twitter/tweet/advanced_search", params);
+  return {
+    tweets: data.data?.tweets ?? data.tweets ?? [],
+    has_next_page: data.has_next_page ?? data.data?.has_next_page ?? false,
+    next_cursor: data.next_cursor ?? data.data?.next_cursor ?? "",
+  };
+}
+
 export { USER_ID, API_KEY };
